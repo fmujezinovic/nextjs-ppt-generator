@@ -3,63 +3,44 @@ import PptxGenJS from "pptxgenjs";
 export async function POST(req) {
   try {
     const { slides, title, author, slideFormat } = await req.json();
+
     let pres = new PptxGenJS();
     pres.layout = slideFormat === "4:3" ? "LAYOUT_4x3" : "LAYOUT_WIDE";
 
-    let logoPath = "public/ukc-mb-logo.png";
+    let logoPath = "/ukc-mb-logo.png"; // Fiksna pot do logotipa
 
-    // Začetni slajd z naslovom in avtorjem (Title Slide)
+    // Naslovni slajd
     let titleSlide = pres.addSlide();
     titleSlide.addText(title || "Moja predstavitev", {
       x: 0.5,
       y: 0.5,
-      w: 9,
-      h: 1,
       fontSize: 32,
       bold: true,
     });
     titleSlide.addText(`Avtor: ${author || "Neznano"}`, {
       x: 0.5,
       y: 1.5,
-      w: 9,
-      h: 1,
       fontSize: 24,
     });
-    titleSlide.addImage({ path: logoPath, x: 9, y: 0.2, w: 1, h: 1 });
+    titleSlide.addImage({ path: logoPath, x: "85%", y: "5%", w: 1.5, h: 1.5 });
 
-    // Uporabniški slajdi (Title and Content Layout)
+    // Ustvarjanje slajdov
     for (let i = 0; i < slides; i++) {
       let slide = pres.addSlide();
-      slide.addText(`Slide ${i + 1}`, {
-        x: 0.5,
-        y: 0.5,
-        w: 9,
-        h: 1,
-        fontSize: 28,
-        bold: true,
-      });
-      slide.addText(`Vsebina za slide ${i + 1}`, {
-        x: 0.5,
-        y: 1.5,
-        w: 9,
-        h: 5,
-        fontSize: 24,
-      });
-      slide.addImage({ path: logoPath, x: 9, y: 0.2, w: 1, h: 1 });
+      slide.addText(`Slide ${i + 1}`, { x: 0.5, y: 0.5, fontSize: 24 });
+      slide.addImage({ path: logoPath, x: "85%", y: "5%", w: 1.5, h: 1.5 });
     }
 
-    // Zaključni slajd (Hvala!)
+    // Zaključni slajd
     let finalSlide = pres.addSlide();
     finalSlide.addText("Hvala!", {
       x: "50%",
       y: "50%",
-      w: 6,
-      h: 2,
       fontSize: 36,
       align: "center",
       bold: true,
     });
-    finalSlide.addImage({ path: logoPath, x: 9, y: 0.2, w: 1, h: 1 });
+    finalSlide.addImage({ path: logoPath, x: "85%", y: "5%", w: 1.5, h: 1.5 });
 
     const data = await pres.write("base64");
     const buffer = Buffer.from(data, "base64");
