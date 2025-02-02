@@ -1,14 +1,16 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function Home() {
   const [slides, setSlides] = useState(1);
-  const [isClient, setIsClient] = useState(false);
+  const secondSectionRef = useRef(null); // Referenca na drugo sekcijo
 
-  // Poskrbimo, da se vsebina naloži samo v brskalniku
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  // Funkcija za premik na drugo sekcijo
+  const scrollToSecondSection = () => {
+    if (secondSectionRef.current) {
+      secondSectionRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   const handleDownload = async () => {
     const response = await fetch("/api/generatePPT", {
@@ -41,30 +43,33 @@ export default function Home() {
         <h2 className="text-xl mt-2 text-gray-600">
           Enostavno vnesite število prosojnic in ustvarite predstavitev!
         </h2>
+        <button
+          onClick={scrollToSecondSection}
+          className="bg-blue-500 text-white px-6 py-2 rounded-md mt-6 hover:bg-blue-600"
+        >
+          Pojdi na ustvarjanje prosojnic
+        </button>
       </section>
 
       {/* DRUGA SEKCJA */}
-      <section className="h-screen flex flex-col justify-center items-center bg-white">
+      <section
+        ref={secondSectionRef}
+        className="h-screen flex flex-col justify-center items-center bg-white"
+      >
         <h1 className="text-3xl font-semibold">Ustvari PowerPoint</h1>
-
-        {/* Input se prikaže šele, ko je komponenta naložena v brskalniku */}
-        {isClient && (
-          <>
-            <input
-              type="number"
-              value={slides}
-              onChange={(e) => setSlides(e.target.value)}
-              min="1"
-              className="border p-2 rounded-md mt-4 text-lg w-24 text-center"
-            />
-            <button
-              onClick={handleDownload}
-              className="bg-blue-500 text-white px-6 py-2 rounded-md mt-4 hover:bg-blue-600"
-            >
-              Ustvari PowerPoint
-            </button>
-          </>
-        )}
+        <input
+          type="number"
+          value={slides}
+          onChange={(e) => setSlides(e.target.value)}
+          min="1"
+          className="border p-2 rounded-md mt-4 text-lg w-24 text-center"
+        />
+        <button
+          onClick={handleDownload}
+          className="bg-blue-500 text-white px-6 py-2 rounded-md mt-4 hover:bg-blue-600"
+        >
+          Ustvari PowerPoint
+        </button>
       </section>
     </main>
   );
