@@ -41,7 +41,7 @@ export default function Home() {
       {/* PRVA SEKCJA - HEADER */}
       <section className="bg-red-200 w-full py-4">
         <div className="max-w-5xl mx-auto flex justify-between items-center px-8">
-          <div className="font-bold text-lg">Ustvarjalec prosojnic</div>
+          <div className="font-bold text-lg">Ustvarjalec prosojnic 2</div>
           <div>
             <a className="text-black font-medium" href="#home">
               Home
