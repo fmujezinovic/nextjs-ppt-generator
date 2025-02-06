@@ -15,12 +15,12 @@ export default function Home() {
   };
 
   const handleDownload = async (e) => {
-    e.preventDefault(); // Spriječite ponovno učitavanje stranice
+    e.preventDefault();
 
     const response = await fetch("/api/generatePPT", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slides, title, author, slideFormat: "16:9" }), // Uvijek šaljemo "16:9"
+      body: JSON.stringify({ slides, title, author, slideFormat: "16:9" }),
     });
 
     if (response.ok) {
@@ -32,6 +32,9 @@ export default function Home() {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+
+      // Beleženje prenosov
+      await fetch("/api/trackDownload", { method: "POST" });
     } else {
       console.error("Error generating PowerPoint");
     }
@@ -119,7 +122,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Third Section - Explanation and Images */}
       {/* Third Section - What the button creates */}
       <section className="w-full py-10 flex justify-center bg-gray-100 px-6 sm:px-12">
         <div className="max-w-5xl w-full text-center">
