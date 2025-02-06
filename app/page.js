@@ -120,19 +120,20 @@ export default function Home() {
       </section>
 
       {/* Third Section - Explanation and Images */}
-      <section className="w-full py-10 flex justify-center bg-gray-100">
-        <div className="max-w-4xl w-full text-center">
-          <h1 className="text-3xl font-bold text-blue-700 mb-4">
+      {/* Third Section - What the button creates */}
+      <section className="w-full py-10 flex justify-center bg-gray-100 px-6 sm:px-12">
+        <div className="max-w-5xl w-full text-center">
+          <h1 className="text-3xl sm:text-4xl font-bold text-blue-700 mb-6">
             What the press of a button creates?
           </h1>
           <p className="text-lg text-gray-700 mb-6">
             After you press a button, a PowerPoint presentation is created and
-            downloaded in your download folder. Minimally, you have 3 slides
+            downloaded into your download folder. Minimally, you have 3 slides
             that look like this:
           </p>
 
-          {/* Images Row */}
-          <div className="flex flex-col md:flex-row justify-center gap-4 mb-6">
+          {/* Image Preview Section */}
+          <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-8 items-center">
             <Image
               src="/slide1-preview.png"
               alt="Slide 1 Preview"
@@ -156,12 +157,13 @@ export default function Home() {
             />
           </div>
 
-          <p className="text-lg text-gray-700 mb-4">
-            If you want more slides, you can change the number in the form.
-            Also, you can add your own title and the name of the author of the
+          <p className="text-lg text-gray-700 mt-6">
+            If you want more slides, you can change the number in the form. You
+            can also add your own title and the name of the author of the
             presentation.
           </p>
-          <p className="text-xl font-semibold text-blue-700">Enjoy! 🎉</p>
+
+          <p className="text-lg text-blue-700 mt-4 font-semibold">Enjoy! 🎉</p>
         </div>
       </section>
     </main>
