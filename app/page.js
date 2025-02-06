@@ -3,7 +3,7 @@ import { useState, useRef } from "react";
 import Image from "next/image";
 
 export default function Home() {
-  const [slides, setSlides] = useState(1);
+  const [slides, setSlides] = useState(3);
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const secondSectionRef = useRef(null);
@@ -81,14 +81,14 @@ export default function Home() {
                 type="number"
                 value={slides}
                 onChange={(e) => setSlides(e.target.value)}
-                min="1"
+                min="3"
                 placeholder="Enter the number of slides"
                 className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-indigo-300 text-center"
               />
             </div>
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Title of presentation
+                Title of presentation (optional)
               </label>
               <input
                 type="text"
@@ -100,7 +100,7 @@ export default function Home() {
             </div>
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Author of presentation
+                Author of presentation (optional)
               </label>
               <input
                 type="text"

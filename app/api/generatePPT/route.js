@@ -5,7 +5,7 @@ export async function POST(req) {
     const { slides, title, author, slideFormat } = await req.json();
 
     let pres = new PptxGenJS();
-    pres.layout = slideFormat === "4:3" ? "LAYOUT_4x3" : "LAYOUT_WIDE";
+    pres.layout = "LAYOUT_WIDE"; // Uvijek koristite wide format
 
     let logoPath = process.cwd() + "/public/logo.jpg";
     let imagePath = process.cwd() + "/public/nature.jpg";
