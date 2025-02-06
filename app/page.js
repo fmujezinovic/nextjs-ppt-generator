@@ -42,11 +42,11 @@ export default function Home() {
       {/* First Section - Image, Title, Button */}
       <section className="bg-gray-200 w-full py-10 flex justify-center">
         <div className="max-w-5xl flex flex-col lg:flex-row items-center gap-8 px-8">
-          <div className="w-1/2">
+          <div className="w-full lg:w-1/2 lg:-ml-12">
             <Image
               src="https://static1.anpoimages.com/wordpress/wp-content/uploads/2024/01/powerpoint-hero-1.jpg"
               alt="Presentation"
-              width={500}
+              width={600}
               height={300}
               className="rounded-lg shadow-lg"
             />
@@ -56,8 +56,7 @@ export default function Home() {
               Fast track to your presentation! ⚡
             </h1>
             <p className="text-lg text-gray-700 mt-2">
-              Enter the desired number of slides – the presentation draft is
-              already yours! 🚀
+              Just press a button 🚀 – the presentation draft is already yours!
             </p>
           </div>
         </div>
@@ -75,7 +74,7 @@ export default function Home() {
           <form className="space-y-4 mt-6" onSubmit={handleDownload}>
             <div>
               <label className="block text-gray-700 font-medium mb-2">
-                Number of slides
+                Number of slides (optional)
               </label>
               <input
                 type="number"
@@ -117,6 +116,52 @@ export default function Home() {
               Create PowerPoint
             </button>
           </form>
+        </div>
+      </section>
+
+      {/* Third Section - Explanation and Images */}
+      <section className="w-full py-10 flex justify-center bg-gray-100">
+        <div className="max-w-4xl w-full text-center">
+          <h1 className="text-3xl font-bold text-blue-700 mb-4">
+            What the press of a button creates?
+          </h1>
+          <p className="text-lg text-gray-700 mb-6">
+            After you press a button, a PowerPoint presentation is created and
+            downloaded in your download folder. Minimally, you have 3 slides
+            that look like this:
+          </p>
+
+          {/* Images Row */}
+          <div className="flex flex-col md:flex-row justify-center gap-4 mb-6">
+            <Image
+              src="/slide1-preview.png"
+              alt="Slide 1 Preview"
+              width={300}
+              height={200}
+              className="rounded-lg shadow-md"
+            />
+            <Image
+              src="/slide2-preview.png"
+              alt="Slide 2 Preview"
+              width={300}
+              height={200}
+              className="rounded-lg shadow-md"
+            />
+            <Image
+              src="/slide3-preview.png"
+              alt="Slide 3 Preview"
+              width={300}
+              height={200}
+              className="rounded-lg shadow-md"
+            />
+          </div>
+
+          <p className="text-lg text-gray-700 mb-4">
+            If you want more slides, you can change the number in the form.
+            Also, you can add your own title and the name of the author of the
+            presentation.
+          </p>
+          <p className="text-xl font-semibold text-blue-700">Enjoy! 🎉</p>
         </div>
       </section>
     </main>
