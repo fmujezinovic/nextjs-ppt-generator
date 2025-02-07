@@ -1,59 +1,95 @@
 import fs from "fs";
 import path from "path";
 
-const filePath = path.join(process.cwd(), "public", "downloads.json");
+// Dodamo podporo za Vercel KV Database
+const isLocal = process.env.NODE_ENV === "development";
+const filePath = path.join(process.cwd(), "public", "download_count.json");
 
-export async function GET(req) {
+// Funkcija za Vercel KV Database
+const updateVercelKV = async () => {
   try {
-    if (!fs.existsSync(filePath)) {
-      return new Response(JSON.stringify({ error: "No data available." }), {
-        status: 404,
+    const url = `${process.env.KV_REST_API_URL}/increment/downloads`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
+      },
+    });
+
+    if (!response.ok) throw new Error("Error updating Vercel KV");
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Vercel KV error:", error);
+    return { error: "Failed to update download count" };
+  }
+};
+
+// GET zahteva - vrača število prenosov
+export async function GET() {
+  try {
+    if (isLocal) {
+      // Lokalno shranjujemo podatke v JSON datoteko
+      if (!fs.existsSync(filePath))
+        return new Response(JSON.stringify({ count: 0 }), { status: 200 });
+
+      const data = fs.readFileSync(filePath, "utf-8");
+      return new Response(data, {
+        headers: { "Content-Type": "application/json" },
+      });
+    } else {
+      // Na Vercelu uporabljamo KV Database
+      const url = `${process.env.KV_REST_API_URL}/get/downloads`;
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Error fetching download count");
+
+      const data = await response.json();
+      return new Response(JSON.stringify({ count: data.result || 0 }), {
         headers: { "Content-Type": "application/json" },
       });
     }
-
-    const rawData = fs.readFileSync(filePath, "utf-8");
-    const data = JSON.parse(rawData);
-
-    return new Response(JSON.stringify(data), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
   } catch (error) {
     console.error("Error fetching download data:", error);
-    return new Response(JSON.stringify({ error: "Error fetching data." }), {
+    return new Response(JSON.stringify({ error: "Error fetching data" }), {
       status: 500,
-      headers: { "Content-Type": "application/json" },
     });
   }
 }
 
-export async function POST(req) {
+// POST zahteva - poveča število prenosov
+export async function POST() {
   try {
-    const today = new Date().toISOString().split("T")[0]; // Današnji datum (YYYY-MM-DD)
-    let data = {};
-
-    if (fs.existsSync(filePath)) {
-      const rawData = fs.readFileSync(filePath, "utf-8");
-      data = JSON.parse(rawData);
-    }
-
-    data[today] = (data[today] || 0) + 1; // Povečaj števec za današnji dan
-
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-
-    return new Response(
-      JSON.stringify({ success: true, downloads: data[today] }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
+    if (isLocal) {
+      let data = { count: 0 };
+      if (fs.existsSync(filePath)) {
+        const rawData = fs.readFileSync(filePath, "utf-8");
+        data = JSON.parse(rawData);
       }
-    );
+
+      data.count += 1;
+      fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+
+      return new Response(
+        JSON.stringify({ success: true, count: data.count }),
+        { headers: { "Content-Type": "application/json" } }
+      );
+    } else {
+      const result = await updateVercelKV();
+      return new Response(JSON.stringify(result), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
   } catch (error) {
     console.error("Error tracking download:", error);
-    return new Response(JSON.stringify({ error: "Error tracking download." }), {
+    return new Response(JSON.stringify({ error: "Error tracking download" }), {
       status: 500,
-      headers: { "Content-Type": "application/json" },
     });
   }
 }
