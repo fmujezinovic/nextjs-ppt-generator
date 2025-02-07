@@ -1,14 +1,15 @@
 import fs from "fs";
 import path from "path";
 
-// Dodamo podporo za Vercel KV Database
 const isLocal = process.env.NODE_ENV === "development";
 const filePath = path.join(process.cwd(), "public", "download_count.json");
 
-// Funkcija za Vercel KV Database
+// Funkcija za ažuriranje broja preuzimanja u Vercel KV
 const updateVercelKV = async () => {
   try {
-    const url = `${process.env.KV_REST_API_URL}/increment/downloads`;
+    const url = `${process.env.KV_REST_API_URL}/incr/downloads`; // Promijenjeno "increment" u "incr"
+    console.log("Updating Vercel KV:", url); // Debugging log
+
     const response = await fetch(url, {
       method: "POST",
       headers: {
@@ -16,9 +17,11 @@ const updateVercelKV = async () => {
       },
     });
 
-    if (!response.ok) throw new Error("Error updating Vercel KV");
+    if (!response.ok)
+      throw new Error(`Error updating Vercel KV: ${await response.text()}`);
 
     const data = await response.json();
+    console.log("Vercel KV Update Response:", data); // Debugging log
     return data;
   } catch (error) {
     console.error("Vercel KV error:", error);
@@ -26,11 +29,10 @@ const updateVercelKV = async () => {
   }
 };
 
-// GET zahteva - vrača število prenosov
+// GET request - vraća broj preuzimanja
 export async function GET() {
   try {
     if (isLocal) {
-      // Lokalno shranjujemo podatke v JSON datoteko
       if (!fs.existsSync(filePath))
         return new Response(JSON.stringify({ count: 0 }), { status: 200 });
 
@@ -39,8 +41,9 @@ export async function GET() {
         headers: { "Content-Type": "application/json" },
       });
     } else {
-      // Na Vercelu uporabljamo KV Database
       const url = `${process.env.KV_REST_API_URL}/get/downloads`;
+      console.log("Fetching from Vercel KV:", url); // Debugging log
+
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -48,22 +51,24 @@ export async function GET() {
         },
       });
 
-      if (!response.ok) throw new Error("Error fetching download count");
+      if (!response.ok)
+        throw new Error(`Error fetching count: ${await response.text()}`);
 
       const data = await response.json();
+      console.log("Fetched Count:", data); // Debugging log
       return new Response(JSON.stringify({ count: data.result || 0 }), {
         headers: { "Content-Type": "application/json" },
       });
     }
   } catch (error) {
-    console.error("Error fetching download data:", error);
+    console.error("Error fetching download count:", error);
     return new Response(JSON.stringify({ error: "Error fetching data" }), {
       status: 500,
     });
   }
 }
 
-// POST zahteva - poveča število prenosov
+// POST request - povećava broj preuzimanja
 export async function POST() {
   try {
     if (isLocal) {
@@ -78,7 +83,9 @@ export async function POST() {
 
       return new Response(
         JSON.stringify({ success: true, count: data.count }),
-        { headers: { "Content-Type": "application/json" } }
+        {
+          headers: { "Content-Type": "application/json" },
+        }
       );
     } else {
       const result = await updateVercelKV();
