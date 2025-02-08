@@ -58,8 +58,14 @@ export default function Home() {
             <h1 className="text-4xl font-extrabold text-blue-700 mb-6">
               Fast track to your presentation! ⚡
             </h1>
-            <p className="text-lg text-gray-700 mt-2">
-              Just press a button 🚀 – the presentation draft is already yours!
+            <p className="text-lg text-gray-700 mt-2 mb-6">
+              Just press a button bellow and the presentation draft is already
+              yours! 🚀
+            </p>
+            <p className="text-lg text-gray-700 mb-6">
+              <strong className="text-blue-700">Benefits:</strong> This saves
+              you time by automating slides creation, ensuring a polished and
+              consistent design instantly.
             </p>
           </div>
         </div>
@@ -116,7 +122,7 @@ export default function Home() {
               type="submit"
               className="w-full bg-blue-600 text-white py-2 rounded-md font-medium hover:bg-blue-700 transition"
             >
-              Create PowerPoint
+              Create instantly your PowerPoint Presentation
             </button>
           </form>
         </div>
@@ -132,6 +138,10 @@ export default function Home() {
             After you press a button, a PowerPoint presentation is created and
             downloaded into your download folder. Minimally, you have 3 slides
             that look like this:
+          </p>
+          <p className="text-lg text-gray-700 mb-6">
+            <strong>Benefits:</strong> This saves you time by automating slide
+            creation, ensuring a polished and consistent design instantly.
           </p>
 
           {/* Image Preview Section */}
