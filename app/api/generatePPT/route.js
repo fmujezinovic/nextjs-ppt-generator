@@ -1,18 +1,23 @@
 import PptxGenJS from "pptxgenjs";
 
-export async function POST(req) {
+export const POST = async (req) => {
   try {
-    const { slides, title, author, slideFormat } = await req.json();
+    const {
+      sections,
+      title,
+      author,
+      fontTitle = "Arial",
+      fontText = "Roboto",
+    } = await req.json();
 
-    let pres = new PptxGenJS();
-    pres.layout = "LAYOUT_WIDE"; // Uvijek koristite wide format
+    const pres = new PptxGenJS();
+    pres.layout = "LAYOUT_WIDE";
 
-    let logoPath = process.cwd() + "/public/logo.jpg";
-    let imagePath = process.cwd() + "/public/nature.jpg";
-    let backgroundPath = process.cwd() + "/public/background-image.png";
+    const logoPath = process.cwd() + "/public/logo.jpg";
+    const imagePath = process.cwd() + "/public/nature.jpg";
+    const backgroundPath = process.cwd() + "/public/background-image.png";
 
-    // Naslovni slajd
-    let titleSlide = pres.addSlide();
+    const titleSlide = pres.addSlide();
     titleSlide.background = { path: backgroundPath };
     titleSlide.addText(title || "Title", {
       x: 1,
@@ -20,98 +25,130 @@ export async function POST(req) {
       w: 11,
       h: 1,
       fontSize: 52,
-      fontFace: "Arial black, sans-serif",
+      fontFace: fontTitle,
       color: "#1E3A8A",
       bold: true,
       align: "center",
     });
-
-    titleSlide.addText(`${author || "Autor"}`, {
+    titleSlide.addText(author || "Author", {
       x: 1,
       y: 4.5,
       w: 11,
       h: 1,
       fontSize: 24,
-      fontFace: "Roboto, Arial, sans-serif",
+      fontFace: fontText,
       color: "#4F6FD6",
       align: "center",
     });
-
     titleSlide.addImage({ path: logoPath, x: 11, y: 0.5, w: 1, h: 1 });
 
-    // Uporabniški slajdi
-    for (let i = 0; i < slides - 2; i++) {
-      let slide = pres.addSlide();
-      slide.background = { path: backgroundPath };
-
-      slide.addText("Heading 1", {
-        x: 0.8,
-        y: 0.4,
-        w: 8,
+    for (const section of sections) {
+      const sectionSlide = pres.addSlide();
+      sectionSlide.background = { path: backgroundPath };
+      sectionSlide.addText(section.name || "Section", {
+        x: 1,
+        y: 3,
+        w: 11,
         h: 1,
-        fontSize: 32,
+        fontSize: 40,
+        fontFace: fontTitle,
+        color: "#1E3A8A",
         bold: true,
-        color: "1F497D",
-        fontFace: "Roboto, Arial, sans-serif",
+        align: "center",
       });
 
-      slide.addText(
-        [
-          {
-            text: "📌 Subtitle 1\n",
-            options: { bold: true, color: "1F497D", fontSize: 20 },
-          },
-          {
-            text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n\n\n",
-            options: { fontSize: 16, color: "333333" },
-          },
-          {
-            text: "📌 Subtitle 2\n",
-            options: { bold: true, color: "1F497D", fontSize: 20 },
-          },
-          {
-            text: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.\n\n\n",
-            options: { fontSize: 16, color: "333333" },
-          },
-          {
-            text: "📌 Subtitle 3\n",
-            options: { bold: true, color: "1F497D", fontSize: 20 },
-          },
-          {
-            text: "Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur.",
-            options: { fontSize: 16, color: "333333" },
-          },
-        ],
-        {
+      for (const s of section.contents) {
+        const slide = pres.addSlide();
+        slide.background = { path: backgroundPath };
+
+        slide.addText(s.title || "Untitled", {
           x: 0.8,
+          y: 0.4,
+          w: 8,
+          h: 1,
+          fontSize: 32,
+          bold: true,
+          color: "1F497D",
+          fontFace: fontTitle,
+          shrinkText: true,
+        });
+
+        slide.addText(
+          [
+            s.paragraph1 && {
+              text: "📌 " + s.paragraph1 + "\n\n\n",
+              options: { fontSize: 16, color: "333333" },
+            },
+            s.paragraph2 && {
+              text: "📌 " + s.paragraph2 + "\n\n\n",
+              options: { fontSize: 16, color: "333333" },
+            },
+            s.paragraph3 && {
+              text: "📌 " + s.paragraph3,
+              options: { fontSize: 16, color: "333333" },
+            },
+          ].filter(Boolean),
+          {
+            x: 0.8,
+            y: 1.5,
+            w: 6.5,
+            h: 5,
+            fontFace: fontText,
+            shrinkText: true,
+            valign: "middle",
+          }
+        );
+
+        const imageOpts = {
+          x: 7.5,
           y: 1.5,
-          w: 6.5,
+          w: 4.5,
           h: 5,
-          fontFace: "Roboto, Arial, sans-serif",
+          sizing: {
+            type: "contain", // ✅ ohrani proporce slike
+            w: 4.5,
+            h: 5,
+          },
+          rounding: 0.3,
+          shadow: {
+            type: "outer",
+            angle: 45,
+            blur: 5,
+            offset: 3,
+            color: "888888",
+          },
+        };
+
+        try {
+          if (s.customImage) {
+            slide.addImage({
+              data: s.customImage,
+              ...imageOpts,
+            });
+          } else if (s.customImageUrl?.startsWith("http")) {
+            const res = await fetch(s.customImageUrl);
+            if (!res.ok) throw new Error("Slika ni dosegljiva");
+            const buffer = await res.arrayBuffer();
+            const base64Image = Buffer.from(buffer).toString("base64");
+            const mimeType = res.headers.get("content-type") || "image/jpeg";
+            slide.addImage({
+              data: `data:${mimeType};base64,${base64Image}`,
+              ...imageOpts,
+            });
+          } else {
+            slide.addImage({
+              path: imagePath,
+              ...imageOpts,
+            });
+          }
+        } catch (err) {
+          console.warn("Napaka pri sliki, uporabljen fallback:", err.message);
+          slide.addImage({ path: imagePath, ...imageOpts });
         }
-      );
-
-      slide.addImage({
-        path: imagePath,
-        x: 8,
-        y: 2,
-        w: 4.2,
-        h: 4.2,
-        rounding: 0.3,
-
-        shadow: {
-          type: "outer",
-          angle: 45,
-          blur: 5,
-          offset: 3,
-          color: "888888",
-        }, // Blaga senka
-      });
+      }
     }
 
-    // Zaključni slajd
-    let finalSlide = pres.addSlide();
-    finalSlide.background = { path: backgroundPath };
+    const finalSlide = pres.addSlide();
     finalSlide.background = { path: backgroundPath };
     finalSlide.addText("Thank you for your attention!", {
       x: 1,
@@ -119,15 +156,13 @@ export async function POST(req) {
       w: 11,
       h: 1,
       fontSize: 52,
-      fontFace: "Arial black, sans-serif",
+      fontFace: fontTitle,
       color: "#1E3A8A",
       bold: true,
       align: "center",
     });
-
     finalSlide.addImage({ path: logoPath, x: 11, y: 0.5, w: 1, h: 1 });
 
-    // Generiranje PPTX
     const data = await pres.write("base64");
     const buffer = Buffer.from(data, "base64");
 
@@ -148,4 +183,4 @@ export async function POST(req) {
       }
     );
   }
-}
+};

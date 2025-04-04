@@ -8,8 +8,8 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "Generator prosojnic",
-  description: "Ustvari želeno število prosojnic",
+  title: "Slides generator",
+  description: "Make your slides fast",
 };
 
 export default function RootLayout({ children }) {
