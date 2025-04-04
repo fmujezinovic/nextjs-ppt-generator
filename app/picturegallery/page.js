@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import {
@@ -22,27 +22,25 @@ export default function PictureGalleryPage() {
     setFileURLs(selected.map((f) => URL.createObjectURL(f)));
   };
 
-  const handleReturnToSections = () => {
-    const search = sessionStorage.getItem("presentationSearch") || "";
-    router.push("/sections" + search);
+  const handleReturnToHomepage = () => {
+    router.push("/");
   };
 
-const handleDownloadZip = async () => {
-  const JSZip = (await import("jszip")).default;
-  const saveAs = (await import("file-saver")).default;
-  const zip = new JSZip();
+  const handleDownloadZip = async () => {
+    const JSZip = (await import("jszip")).default;
+    const saveAs = (await import("file-saver")).default;
+    const zip = new JSZip();
 
-  files.forEach((file, index) => {
-    const fileName = `${index + 1}${file.name.slice(
-      file.name.lastIndexOf(".")
-    )}`;
-    zip.file(fileName, file);
-  });
+    files.forEach((file, index) => {
+      const fileName = `${index + 1}${file.name.slice(
+        file.name.lastIndexOf(".")
+      )}`;
+      zip.file(fileName, file);
+    });
 
-  const blob = await zip.generateAsync({ type: "blob" });
-  saveAs(blob, "images.zip");
-};
-
+    const blob = await zip.generateAsync({ type: "blob" });
+    saveAs(blob, "images.zip");
+  };
 
   const handleDragEnd = (event) => {
     const { active, over } = event;
@@ -93,10 +91,10 @@ const handleDownloadZip = async () => {
       )}
 
       <button
-        onClick={handleReturnToSections}
+        onClick={handleReturnToHomepage}
         className="mt-8 px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
       >
-        Vrni se na sekcije
+        Back to homepage
       </button>
     </main>
   );

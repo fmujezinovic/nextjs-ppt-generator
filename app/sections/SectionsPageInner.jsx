@@ -153,27 +153,7 @@ function SectionsPageInner() {
           </div>
 
           <div className="flex flex-col gap-2 w-full md:w-auto">
-            <button
-              onClick={() => {
-                const proceed = confirm(
-                  "Just a heads-up: if you've already built your slides, they'll be lost when you navigate away. Proceed?"
-                );
-                if (!proceed) return;
-
-                const safeSections = sections.map(({ contents, ...rest }) => ({
-                  ...rest,
-                  contents: contents.map(({ customImage, ...s }) => s),
-                }));
-                sessionStorage.setItem(
-                  "presentationSearch",
-                  window.location.search
-                );
-                router.push("/picturegallery");
-              }}
-              className="bg-purple-600 text-white px-4 py-2 rounded-md text-sm"
-            >
-              Arrange pics for your presentation
-            </button>
+           
 
             <label className="bg-blue-600 text-white px-4 py-2 rounded-md cursor-pointer text-sm text-center">
               Upload images into slides
